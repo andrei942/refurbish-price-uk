@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Refurbish Price UK - Estimate full house renovation costs including paint, wallpaper, flooring, doors, windows and more.">
 <style>
-  body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 10px; line-height: 1.5; }
+  body { font-family: Arial, sans-serif; max-width: 750px; margin: 30px auto; padding: 10px; line-height: 1.5; }
   h1,h2 { color: #2c3e50; }
   form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
   label { font-weight: bold; }
@@ -19,8 +19,8 @@
 <body>
 
 <h1>Refurbish Price UK</h1>
-<p>Estimate the full refurbishment cost of your house in the UK.</p>
-<p><strong>Disclaimer:</strong> All prices are estimates and may vary based on location, materials, and labour.</p>
+<p>Estimate the refurbishment cost of your room in the UK.</p>
+<p><strong>Disclaimer:</strong> Prices are estimates and may vary based on location, materials, and labour.</p>
 
 <form id="estimateForm">
   <label for="room">Room Type:</label>
@@ -31,12 +31,8 @@
     <option value="living">Living Room</option>
   </select>
 
-  <label for="size">Room Size:</label>
-  <select id="size">
-    <option value="small">Small (10 m²)</option>
-    <option value="medium">Medium (20 m²)</option>
-    <option value="large">Large (30 m²)</option>
-  </select>
+  <label for="size">Room Size (m²):</label>
+  <input type="number" id="size" value="10" min="1">
 
   <label for="quality">Quality Level:</label>
   <select id="quality">
@@ -45,18 +41,25 @@
     <option value="premium">Premium</option>
   </select>
 
-  <label for="wall">Walls:</label>
-  <select id="wall">
+  <label for="wall">Wall Covering:</label>
+  <select id="wall" onchange="updateWallSubOptions()">
     <option value="paint">Paint</option>
     <option value="wallpaper">Wallpaper</option>
     <option value="tile">Tile</option>
   </select>
 
-  <label for="flooring">Flooring:</label>
+  <div id="wallSubDiv" style="display:none;">
+    <label for="wallSub">Select Type:</label>
+    <select id="wallSub"></select>
+  </div>
+
+  <label for="flooring">Flooring Type:</label>
   <select id="flooring">
     <option value="wood">Wood</option>
+    <option value="laminate">Laminate</option>
     <option value="carpet">Carpet</option>
     <option value="tile">Tile</option>
+    <option value="vinyl">Vinyl</option>
   </select>
 
   <label for="doors">Number of Doors:</label>
@@ -75,36 +78,73 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-  // UK realistic prices per m² or per unit
-  const wallPrices = { paint: { basic:10, mid:15, premium:25 }, wallpaper: { basic:12, mid:18, premium:30 }, tile: { basic:20, mid:35, premium:50 } };
-  const flooringPrices = { wood:25, carpet:15, tile:30 };
+  // UK prices per m² or per unit
+  const paintPrices = { basic:10, mid:15, premium:25 };
+  const wallpaperPrices = { plain:12, patterned:18, textured:25, premium:40 };
+  const tilePrices = { ceramic:20, porcelain:35, mosaic:50, stone:60 };
+  const flooringPrices = { wood:25, laminate:20, carpet:15, tile:30, vinyl:18 };
   const doorsPrices = { basic:50, mid:100, premium:250 };
   const windowsPrices = { basic:150, mid:250, premium:500 };
-  const roomMultiplier = { small:10, medium:20, large:30 }; // m²
+
+  let wallOptions = {
+    wallpaper:["plain","patterned","textured","premium"],
+    tile:["ceramic","porcelain","mosaic","stone"]
+  };
 
   let currentEstimate = 0;
   let currentSelection = {};
 
+  function updateWallSubOptions(){
+    const wall = document.getElementById('wall').value;
+    const subDiv = document.getElementById('wallSubDiv');
+    const subSelect = document.getElementById('wallSub');
+    subSelect.innerHTML = "";
+
+    if(wall==="paint"){
+      subDiv.style.display = "none";
+    } else {
+      subDiv.style.display = "block";
+      wallOptions[wall].forEach(opt=>{
+        const option = document.createElement("option");
+        option.value = opt;
+        option.text = opt.charAt(0).toUpperCase() + opt.slice(1);
+        subSelect.appendChild(option);
+      });
+    }
+  }
+
   function calculateEstimate() {
     const room = document.getElementById('room').value;
-    const size = document.getElementById('size').value;
+    const size = parseFloat(document.getElementById('size').value);
     const quality = document.getElementById('quality').value;
     const wall = document.getElementById('wall').value;
+    const wallSub = document.getElementById('wallSub').value;
     const flooring = document.getElementById('flooring').value;
     const doors = parseInt(document.getElementById('doors').value);
     const windows = parseInt(document.getElementById('windows').value);
 
-    const area = roomMultiplier[size];
+    if(isNaN(size) || size<=0){
+      alert("Please enter a valid room size in m².");
+      return;
+    }
 
-    const wallCost = wallPrices[wall][quality]*area;
-    const flooringCost = flooringPrices[flooring]*area;
+    let wallCost = 0;
+    if(wall==="paint"){
+      wallCost = paintPrices[quality]*size;
+    } else if(wall==="wallpaper"){
+      wallCost = wallpaperPrices[wallSub]*size;
+    } else if(wall==="tile"){
+      wallCost = tilePrices[wallSub]*size;
+    }
+
+    const flooringCost = flooringPrices[flooring]*size;
     const doorsCost = doors * doorsPrices[quality];
     const windowsCost = windows * windowsPrices[quality];
 
     const total = wallCost + flooringCost + doorsCost + windowsCost;
 
     currentEstimate = total;
-    currentSelection = { room, size, quality, wall, flooring, doors, windows, wallCost, flooringCost, doorsCost, windowsCost, total };
+    currentSelection = { room, size, quality, wall, wallSub, flooring, doors, windows, wallCost, flooringCost, doorsCost, windowsCost, total };
 
     document.getElementById('total').textContent = total.toLocaleString();
   }
@@ -123,9 +163,9 @@
     doc.setFontSize(12);
     doc.text("Estimated Renovation Report", 20, 30);
     doc.text(`Room Type: ${currentSelection.room}`, 20, 40);
-    doc.text(`Room Size: ${currentSelection.size}`, 20, 50);
+    doc.text(`Room Size: ${currentSelection.size} m²`, 20, 50);
     doc.text(`Quality Level: ${currentSelection.quality}`, 20, 60);
-    doc.text(`Walls: ${currentSelection.wall} - £${currentSelection.wallCost.toLocaleString()}`, 20, 70);
+    doc.text(`Walls: ${currentSelection.wall}${currentSelection.wallSub ? ' - '+currentSelection.wallSub : ''} - £${currentSelection.wallCost.toLocaleString()}`, 20, 70);
     doc.text(`Flooring: ${currentSelection.flooring} - £${currentSelection.flooringCost.toLocaleString()}`, 20, 80);
     doc.text(`Doors: ${currentSelection.doors} - £${currentSelection.doorsCost.toLocaleString()}`, 20, 90);
     doc.text(`Windows: ${currentSelection.windows} - £${currentSelection.windowsCost.toLocaleString()}`, 20, 100);
@@ -134,6 +174,9 @@
 
     doc.save(`Refurbish_Estimate_${currentSelection.room}.pdf`);
   }
+
+  // Initialize wall sub-options
+  updateWallSubOptions();
 </script>
 
 </body>
