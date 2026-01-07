@@ -6,11 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-<body style="background-image: url('https://images.unsplash.com/photo-1598300051530-353f8e05f226?auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-repeat: no-repeat; background-position: center center; font-family: Arial, sans-serif; color: #fff;">
+<body style="
+  background-image: url('https://images.unsplash.com/photo-1598300051530-353f8e05f226?auto=format&fit=crop&w=1350&q=80');
+  background-size: cover; background-repeat: no-repeat; background-position: center center;
+  font-family: Arial, sans-serif; color: #fff; margin:0; padding:20px;">
 
-<h1 style="text-align:center; text-shadow: 2px 2px 4px #000;">Refurbish Price UK - Multi-Room Estimate</h1>
+<!-- Semi-transparent overlay -->
+<div style="background: rgba(0,0,0,0.7); padding: 20px; border-radius: 15px; max-width: 900px; margin: 0 auto;">
 
-<form id="roomForm" style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+<h1 style="text-align:center; text-shadow: 2px 2px 6px #000; color: #27ae60;">Refurbish Price UK - Multi-Room Estimate</h1>
+
+<form id="roomForm" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
   <label>Room Name:</label>
   <input type="text" id="roomName" value="Bedroom 1" style="width:100%; margin-top:4px;">
 
@@ -38,12 +44,6 @@
     <option value="vinyl">Vinyl</option>
   </select>
 
-  <label>Doors (number):</label>
-  <input type="number" id="doors" value="1" min="0" style="width:100%; margin-top:4px;">
-
-  <label>Windows (number):</label>
-  <input type="number" id="windows" value="1" min="0" style="width:100%; margin-top:4px;">
-
   <h3>Bathroom Fixtures</h3>
   <label><input type="checkbox" class="bathroom" value="toilet"> Toilet (£250)</label>
   <label><input type="checkbox" class="bathroom" value="sink"> Sink (£150)</label>
@@ -68,22 +68,26 @@
   <label><input type="checkbox" class="furniture" value="tvUnit"> TV Unit (£200)</label>
   <label><input type="checkbox" class="furniture" value="wardrobe"> Wardrobe (£500)</label>
 
-  <button type="button" onclick="addRoom()" style="width:100%;">Add Room</button>
+  <button type="button" onclick="addRoom()" style="width:100%; margin-top:10px; background:#e67e22; color:#fff; border:none; padding:10px; border-radius:6px;">Add Room</button>
 </form>
 
-<h2 style="text-shadow: 1px 1px 3px #000;">Rooms</h2>
-<div id="roomList" style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px;"></div>
+<h3 style="text-shadow:1px 1px 3px #000;">Optional Doors & Windows</h3>
+<label><input type="checkbox" class="optionalItem" data-name="Door" data-price="140"> Door (£140 each)</label>
+<label><input type="checkbox" class="optionalItem" data-name="Window" data-price="300"> Window (£300 each)</label>
+
+<h2 style="text-shadow:1px 1px 3px #000;">Rooms</h2>
+<div id="roomList" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;"></div>
 
 <h2>Total Estimate: £<span id="total">0</span></h2>
-<button onclick="downloadPDF()" style="width:100%; margin-top:10px;">Download Full House PDF</button>
+<button onclick="downloadPDF()" style="width:100%; margin-top:10px; background:#27ae60; color:#fff; border:none; padding:10px; border-radius:6px;">Download Full House PDF</button>
+
+</div> <!-- End overlay -->
 
 <script>
 const paint={basic:15,mid:22,premium:32};
 const wallpaper={plain:18,patterned:24,textured:32,premium:45};
 const tiles={ceramic:30,porcelain:45,mosaic:60,stone:75};
 const flooring={wood:35,laminate:28,carpet:22,tile:45,vinyl:25};
-const doors={basic:80,mid:140,premium:300};
-const windows={basic:200,mid:300,premium:600};
 const bathroomItems={toilet:250,sink:150,shower:400,bathtub:350,cabinet:200,mirror:50};
 const kitchenItems={baseCabinet:200,wallCabinet:150,countertop:250,sinkTap:200,ovenHob:400,fridge:350,dishwasher:300};
 const furnitureItems={bed:400,sofa:600,coffeeTable:100,tvUnit:200,wardrobe:500};
@@ -114,21 +118,17 @@ function addRoom(){
   const wallType=document.getElementById('wallType').value;
   const wallSub=document.getElementById('wallSub').value;
   const floorType=document.getElementById('flooring').value;
-  const doorsNum=parseInt(document.getElementById('doors').value);
-  const windowsNum=parseInt(document.getElementById('windows').value);
 
   let wallCost=wallType==="paint"?paint.mid*size:(wallType==="wallpaper"?wallpaper[wallSub]*size:tiles[wallSub]*size);
   let flooringCost=flooring[floorType]*size;
-  let doorsCost=doorsNum*doors.mid;
-  let windowsCost=windowsNum*windows.mid;
 
   let bathroomCost=0; document.querySelectorAll(".bathroom:checked").forEach(el=>{ bathroomCost+=bathroomItems[el.value]; });
   let kitchenCost=0; document.querySelectorAll(".kitchen:checked").forEach(el=>{ kitchenCost+=kitchenItems[el.value]; });
   let furnitureCost=0; document.querySelectorAll(".furniture:checked").forEach(el=>{ furnitureCost+=furnitureItems[el.value]; });
 
-  let total=wallCost+flooringCost+doorsCost+windowsCost+bathroomCost+kitchenCost+furnitureCost;
+  let total=wallCost+flooringCost+bathroomCost+kitchenCost+furnitureCost;
 
-  const room={name,size,wallType,wallSub,floorType,doorsNum,windowsNum,wallCost,flooringCost,doorsCost,windowsCost,bathroomCost,kitchenCost,furnitureCost,total};
+  const room={name,size,wallType,wallSub,floorType,wallCost,flooringCost,bathroomCost,kitchenCost,furnitureCost,total};
   rooms.push(room);
   renderRooms();
   calculateTotal();
@@ -145,9 +145,19 @@ function renderRooms(){
   });
 }
 
+function calculateOptionalItems(){
+  let optionalTotal=0;
+  document.querySelectorAll('.optionalItem:checked').forEach(el=>{
+    optionalTotal += parseFloat(el.getAttribute('data-price'));
+  });
+  return optionalTotal;
+}
+
 function calculateTotal(){
-  const total=rooms.reduce((sum,r)=>sum+r.total,0);
-  document.getElementById('total').textContent=total.toLocaleString();
+  const roomTotal=rooms.reduce((sum,r)=>sum+r.total,0);
+  const optionalTotal = calculateOptionalItems();
+  const total = roomTotal + optionalTotal;
+  document.getElementById('total').textContent = total.toLocaleString();
 }
 
 function downloadPDF(){
@@ -159,20 +169,27 @@ function downloadPDF(){
     doc.text(`${r.name} (Room ${r.size} m²): £${r.total.toLocaleString()}`,20,y); y+=10;
     doc.text(`  Wall: ${r.wallType}${r.wallSub?" - "+r.wallSub:""} - £${r.wallCost.toLocaleString()}`,20,y); y+=10;
     doc.text(`  Flooring: ${r.floorType} - £${r.flooringCost.toLocaleString()}`,20,y); y+=10;
-    doc.text(`  Doors: ${r.doorsNum} - £${r.doorsCost.toLocaleString()}`,20,y); y+=10;
-    doc.text(`  Windows: ${r.windowsNum} - £${r.windowsCost.toLocaleString()}`,20,y); y+=10;
     if(r.bathroomCost>0){ doc.text(`  Bathroom items: £${r.bathroomCost.toLocaleString()}`,20,y); y+=10; }
     if(r.kitchenCost>0){ doc.text(`  Kitchen items: £${r.kitchenCost.toLocaleString()}`,20,y); y+=10; }
     if(r.furnitureCost>0){ doc.text(`  Furniture items: £${r.furnitureCost.toLocaleString()}`,20,y); y+=10; }
     y+=5;
   });
-  const total=rooms.reduce((sum,r)=>sum+r.total,0);
+
+  // Optional Doors & Windows
+  doc.text("Optional Doors & Windows:",20,y); y+=10;
+  document.querySelectorAll('.optionalItem:checked').forEach(el=>{
+    doc.text(`  ${el.getAttribute('data-name')} - £${parseFloat(el.getAttribute('data-price')).toLocaleString()}`,20,y);
+    y+=10;
+  });
+
+  const total=rooms.reduce((sum,r)=>sum+r.total,0)+calculateOptionalItems();
   doc.text(`Total Estimate: £${total.toLocaleString()}`,20,y+5);
   doc.text("Note: Prices are UK average estimates including materials and labour.",20,y+15,{maxWidth:170});
   doc.save("Refurbish_Full_House_Estimate.pdf");
 }
 
 updateWallSub();
+document.querySelectorAll('.optionalItem').forEach(el=>el.addEventListener('change', calculateTotal));
 </script>
 
 </body>
