@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Refurbish Price UK | Full House Estimator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Refurbish Price UK - Estimate full house renovation costs including paint, wallpaper, flooring, doors, windows and more.">
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 10px; line-height: 1.5; }
+  h1,h2 { color: #2c3e50; }
+  form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  label { font-weight: bold; }
+  select,input,button { padding: 8px; font-size: 16px; }
+  button { background-color: #2980b9; color: white; border: none; cursor: pointer; }
+  button:hover { background-color: #1c5980; }
+  #total { font-size: 24px; color: #27ae60; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Refurbish Price UK</h1>
+<p>Estimate the full refurbishment cost of your house in the UK.</p>
+<p><strong>Disclaimer:</strong> All prices are estimates and may vary based on location, materials, and labour.</p>
+
+<form id="estimateForm">
+  <label for="room">Room Type:</label>
+  <select id="room">
+    <option value="bathroom">Bathroom</option>
+    <option value="kitchen">Kitchen</option>
+    <option value="bedroom">Bedroom</option>
+    <option value="living">Living Room</option>
+  </select>
+
+  <label for="size">Room Size:</label>
+  <select id="size">
+    <option value="small">Small (10 m²)</option>
+    <option value="medium">Medium (20 m²)</option>
+    <option value="large">Large (30 m²)</option>
+  </select>
+
+  <label for="quality">Quality Level:</label>
+  <select id="quality">
+    <option value="basic">Basic</option>
+    <option value="mid">Mid</option>
+    <option value="premium">Premium</option>
+  </select>
+
+  <label for="wall">Walls:</label>
+  <select id="wall">
+    <option value="paint">Paint</option>
+    <option value="wallpaper">Wallpaper</option>
+    <option value="tile">Tile</option>
+  </select>
+
+  <label for="flooring">Flooring:</label>
+  <select id="flooring">
+    <option value="wood">Wood</option>
+    <option value="carpet">Carpet</option>
+    <option value="tile">Tile</option>
+  </select>
+
+  <label for="doors">Number of Doors:</label>
+  <input type="number" id="doors" value="1" min="0">
+
+  <label for="windows">Number of Windows:</label>
+  <input type="number" id="windows" value="1" min="0">
+
+  <button type="button" onclick="calculateEstimate()">Get Estimate</button>
+  <button type="button" onclick="downloadPDF()">Download PDF</button>
+</form>
+
+<h2>Estimated Cost: £<span id="total">0</span></h2>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+  // UK realistic prices per m² or per unit
+  const wallPrices = { paint: { basic:10, mid:15, premium:25 }, wallpaper: { basic:12, mid:18, premium:30 }, tile: { basic:20, mid:35, premium:50 } };
+  const flooringPrices = { wood:25, carpet:15, tile:30 };
+  const doorsPrices = { basic:50, mid:100, premium:250 };
+  const windowsPrices = { basic:150, mid:250, premium:500 };
+  const roomMultiplier = { small:10, medium:20, large:30 }; // m²
+
+  let currentEstimate = 0;
+  let currentSelection = {};
+
+  function calculateEstimate() {
+    const room = document.getElementById('room').value;
+    const size = document.getElementById('size').value;
+    const quality = document.getElementById('quality').value;
+    const wall = document.getElementById('wall').value;
+    const flooring = document.getElementById('flooring').value;
+    const doors = parseInt(document.getElementById('doors').value);
+    const windows = parseInt(document.getElementById('windows').value);
+
+    const area = roomMultiplier[size];
+
+    const wallCost = wallPrices[wall][quality]*area;
+    const flooringCost = flooringPrices[flooring]*area;
+    const doorsCost = doors * doorsPrices[quality];
+    const windowsCost = windows * windowsPrices[quality];
+
+    const total = wallCost + flooringCost + doorsCost + windowsCost;
+
+    currentEstimate = total;
+    currentSelection = { room, size, quality, wall, flooring, doors, windows, wallCost, flooringCost, doorsCost, windowsCost, total };
+
+    document.getElementById('total').textContent = total.toLocaleString();
+  }
+
+  function downloadPDF() {
+    if(currentEstimate===0){
+      alert("Please calculate estimate first!");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Refurbish Price UK", 20, 20);
+    doc.setFontSize(12);
+    doc.text("Estimated Renovation Report", 20, 30);
+    doc.text(`Room Type: ${currentSelection.room}`, 20, 40);
+    doc.text(`Room Size: ${currentSelection.size}`, 20, 50);
+    doc.text(`Quality Level: ${currentSelection.quality}`, 20, 60);
+    doc.text(`Walls: ${currentSelection.wall} - £${currentSelection.wallCost.toLocaleString()}`, 20, 70);
+    doc.text(`Flooring: ${currentSelection.flooring} - £${currentSelection.flooringCost.toLocaleString()}`, 20, 80);
+    doc.text(`Doors: ${currentSelection.doors} - £${currentSelection.doorsCost.toLocaleString()}`, 20, 90);
+    doc.text(`Windows: ${currentSelection.windows} - £${currentSelection.windowsCost.toLocaleString()}`, 20, 100);
+    doc.text(`Total Estimate: £${currentSelection.total.toLocaleString()}`, 20, 110);
+    doc.text("Disclaimer: Prices are estimates only and may vary based on location, materials, and labour.", 20, 125, {maxWidth:170});
+
+    doc.save(`Refurbish_Estimate_${currentSelection.room}.pdf`);
+  }
+</script>
+
+</body>
+</html>
