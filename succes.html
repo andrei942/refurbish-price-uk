@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Successful</title>
+    <style>
+        body { font-family: Arial; text-align:center; padding:50px; background:#f8f8f8; }
+        h1 { color: green; }
+        button { background:green; color:white; border:none; padding:12px 20px; font-size:16px; border-radius:8px; cursor:pointer; margin-top:20px; }
+        button:hover { background:darkgreen; }
+    </style>
+</head>
+<body>
+
+<h1>Payment Successful!</h1>
+<p>Click below to download your PDF estimate:</p>
+
+<button id="download-pdf" onclick="generatePDF()">Download PDF Estimate</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
