@@ -1,157 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Refurbish Price UK</title>
-    <style>
-        /* Keep your old site style here */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
-            color: #333;
-            padding: 50px;
-            text-align: center;
-        }
-        h1 {
-            color: green;
-        }
-        label, select, input {
-            display: block;
-            margin: 10px auto;
-            font-size: 16px;
-        }
-        input[type="number"], input[type="text"], select {
-            padding: 5px;
-            width: 200px;
-        }
-        .optionalItem {
-            margin: 5px;
-        }
-        button {
-            background-color: green;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: darkgreen;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Refurbish Price UK</title>
+  <link rel="stylesheet" href="style.css"> <!-- keep your old CSS -->
 </head>
 <body>
+  <div class="container">
+    <h1>Refurbish Price UK</h1>
 
-<h1>Refurbish Price UK</h1>
+    <!-- Room selection -->
+    <label>Room:</label>
+    <select id="roomName">
+      <option value="Bedroom">Bedroom</option>
+      <option value="Bathroom">Bathroom</option>
+      <option value="Living Room">Living Room</option>
+      <option value="Other">Other</option>
+    </select>
 
-<label>Room Type:</label>
-<select id="roomName">
-  <option value="Bedroom">Bedroom</option>
-  <option value="Bathroom">Bathroom</option>
-  <option value="Living Room">Living Room</option>
-  <option value="Other">Other</option>
-</select>
-<input type="text" id="customRoomName" placeholder="Enter room name" style="display:none;">
+    <input type="text" id="customRoomName" placeholder="Enter room name" style="display:none;">
 
-<label>Room Size (m²):</label>
-<input type="number" id="size" placeholder="Enter size">
+    <!-- Room size -->
+    <label>Room size (m²):</label>
+    <input type="number" id="size" placeholder="Enter size">
 
-<label>Wall Type:</label>
-<select id="wallType">
-  <option value="Paint">Paint</option>
-  <option value="Wallpaper">Wallpaper</option>
-  <option value="Tile">Tile</option>
-</select>
+    <!-- Wall type -->
+    <label>Wall type:</label>
+    <select id="wallType">
+      <option value="Paint">Paint</option>
+      <option value="Wallpaper">Wallpaper</option>
+      <option value="Tile">Tile</option>
+    </select>
 
-<label>Flooring:</label>
-<select id="flooring">
-  <option value="Wood">Wood</option>
-  <option value="Tile">Tile</option>
-  <option value="Carpet">Carpet</option>
-</select>
+    <!-- Flooring -->
+    <label>Flooring:</label>
+    <select id="flooring">
+      <option value="Wood">Wood</option>
+      <option value="Tile">Tile</option>
+      <option value="Carpet">Carpet</option>
+    </select>
 
-<label>Optional Items:</label>
-<input type="checkbox" class="optionalItem" data-name="Door" data-price="150"> Door (£150)
-<input type="checkbox" class="optionalItem" data-name="Window" data-price="200"> Window (£200)
+    <!-- Optional items -->
+    <label>Optional Items:</label>
+    <input type="checkbox" class="optionalItem" data-name="Door" data-price="150"> Door (£150)
+    <input type="checkbox" class="optionalItem" data-name="Window" data-price="200"> Window (£200)
 
-<button id="checkout-button">Pay £10 to see estimate</button>
+    <!-- Stripe pay button -->
+    <button id="checkout-button">Pay £10 to download PDF</button>
+  </div>
 
-<!-- jsPDF library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- Stripe library -->
-<script src="https://js.stripe.com/v3/"></script>
-
-<script>
-  // ===== SHOW CUSTOM ROOM FIELD =====
-  document.getElementById('roomName').addEventListener('change', function() {
-      document.getElementById('customRoomName').style.display =
-          this.value === 'Other' ? 'block' : 'none';
-  });
-
-  // ===== COLLECT FORM DATA =====
-  function collectData() {
-      const roomName = document.getElementById('roomName').value === 'Other'
-          ? document.getElementById('customRoomName').value
-          : document.getElementById('roomName').value;
-
-      const size = parseFloat(document.getElementById('size').value) || 0;
-      const wall = document.getElementById('wallType').value;
-      const floor = document.getElementById('flooring').value;
-
-      let optional = [];
-      document.querySelectorAll('.optionalItem:checked').forEach(el => {
-          optional.push({ name: el.dataset.name, price: parseFloat(el.dataset.price) });
-      });
-
-      return { roomName, size, wall, floor, optional };
-  }
-
-  // ===== SAVE DATA =====
-  function saveData() {
-      const data = collectData();
-      localStorage.setItem('estimateData', JSON.stringify(data));
-  }
-
-  // ===== STRIPE CHECKOUT =====
-  const stripe = Stripe('pk_live_51Sn2002K6oA46zDCbC6ODNqsrcezcruvdzJJDtzWhY4CXu1t1KM0C2H2M0wh7ahrBg2SeaPJC5mdKkqQSLsYN1Sh00MditgrNv');
-
-  document.getElementById("checkout-button").addEventListener("click", function() {
-      saveData();
-      fetch("/create-checkout-session", { 
-          method: "POST", 
-          headers: { "Content-Type": "application/json" } 
-      })
-      .then(res => res.json())
-      .then(session => stripe.redirectToCheckout({ sessionId: session.id }))
-      .catch(err => console.error(err));
-  });
-
-  // ===== PDF GENERATOR =====
-  function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const data = JSON.parse(localStorage.getItem("estimateData"));
-      if(!data){ alert("No data available!"); return; }
-
-      const doc = new jsPDF();
-      let y=20;
-      doc.setFontSize(18); doc.text("Refurbish Price UK - Estimate", 20, y); y+=10;
-      doc.setFontSize(12);
-      doc.text(`Room: ${data.roomName} (${data.size} m²)`, 20, y); y+=6;
-      doc.text(`Wall: ${data.wall}`, 20, y); y+=6;
-      doc.text(`Floor: ${data.floor}`, 20, y); y+=6;
-      let total = 0;
-      if(data.optional.length > 0){
-          doc.text("Optional Items:", 20, y); y+=6;
-          data.optional.forEach(item => {
-              doc.text(`${item.name} (£${item.price})`, 20, y);
-              total += item.price; y+=6;
-          });
-      }
-      doc.text(`Total Estimate (materials + labor): £${total}`, 20, y+10);
-      doc.save("Refurbish-Estimate.pdf");
-  }
-</script>
-
+  <!-- Stripe JS -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="script.js"></script>
 </body>
 </html>
