@@ -3,54 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <title>Refurbish Price UK</title>
-  <link rel="stylesheet" href="style.css"> <!-- keep your old CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Refurbish Price UK</h1>
 
-    <!-- Room selection -->
-    <label>Room:</label>
-    <select id="roomName">
-      <option value="Bedroom">Bedroom</option>
-      <option value="Bathroom">Bathroom</option>
-      <option value="Living Room">Living Room</option>
-      <option value="Other">Other</option>
-    </select>
+<div class="container">
 
-    <input type="text" id="customRoomName" placeholder="Enter room name" style="display:none;">
+  <h1 class="title">Refurbish Price UK</h1>
+  <p class="subtitle">Instant renovation estimates for UK homes</p>
 
-    <!-- Room size -->
-    <label>Room size (m²):</label>
-    <input type="number" id="size" placeholder="Enter size">
+  <label>Room</label>
+  <select id="room">
+    <option>Bathroom</option>
+    <option>Kitchen</option>
+    <option>Bedroom</option>
+    <option>Living Room</option>
+  </select>
 
-    <!-- Wall type -->
-    <label>Wall type:</label>
-    <select id="wallType">
-      <option value="Paint">Paint</option>
-      <option value="Wallpaper">Wallpaper</option>
-      <option value="Tile">Tile</option>
-    </select>
+  <label>Room size (m²)</label>
+  <input type="number" id="size" placeholder="e.g. 20">
 
-    <!-- Flooring -->
-    <label>Flooring:</label>
-    <select id="flooring">
-      <option value="Wood">Wood</option>
-      <option value="Tile">Tile</option>
-      <option value="Carpet">Carpet</option>
-    </select>
+  <label>Finish level</label>
+  <select id="finish">
+    <option value="basic">Basic</option>
+    <option value="standard">Standard</option>
+    <option value="premium">Premium</option>
+  </select>
 
-    <!-- Optional items -->
-    <label>Optional Items:</label>
-    <input type="checkbox" class="optionalItem" data-name="Door" data-price="150"> Door (£150)
-    <input type="checkbox" class="optionalItem" data-name="Window" data-price="200"> Window (£200)
+  <button onclick="calculateEstimate()">Calculate Estimate</button>
 
-    <!-- Stripe pay button -->
-    <button id="checkout-button">Pay £10 to download PDF</button>
-  </div>
+  <div id="result"></div>
 
-  <!-- Stripe JS -->
-  <script src="https://js.stripe.com/v3/"></script>
-  <script src="script.js"></script>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
