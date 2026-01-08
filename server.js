@@ -18,8 +18,8 @@ app.post('/create-checkout-session', async (req, res) => {
       quantity: 1,
     }],
     mode: 'payment',
-    success_url: 'https://andrei942.github.io/refurbish-price-uk/',
-    cancel_url: 'https://andrei942.github.io/refurbish-price-uk/',
+    success_url: 'https://refurbish-price-uk.onrender.com/',
+    cancel_url: 'https://refurbish-price-uk.onrender.com/',
   });
   res.json({ id: session.id });
 });
