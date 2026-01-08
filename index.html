@@ -13,28 +13,45 @@
   <h1 class="title">Refurbish Price UK</h1>
   <p class="subtitle">Material & labour estimates for UK homes</p>
 
-  <label>Room</label>
-  <select id="room">
-    <option>Bathroom</option>
-    <option>Kitchen</option>
-    <option>Bedroom</option>
-    <option>Living Room</option>
-  </select>
+  <div class="form-group">
+    <label>Room</label>
+    <select id="room">
+      <option>Bathroom</option>
+      <option>Kitchen</option>
+      <option>Bedroom</option>
+      <option>Living Room</option>
+    </select>
+  </div>
 
-  <label>Room size (m²)</label>
-  <input type="number" id="size" placeholder="e.g. 20">
+  <div class="form-group">
+    <label>Room size (m²)</label>
+    <input type="number" id="size" placeholder="e.g. 20">
+  </div>
 
-  <label>Material</label>
-  <select id="material">
-    <option value="tile">Tile floor</option>
-    <option value="wood">Wood floor</option>
-    <option value="laminate">Laminate floor</option>
-    <option value="vinyl">Vinyl floor</option>
-    <option value="paint">Paint walls</option>
-    <option value="wallpaper">Wallpaper</option>
-  </select>
+  <div class="form-group">
+    <label>Material</label>
+    <select id="material">
+      <!-- Floors -->
+      <option value="tile_floor">Tile floor</option>
+      <option value="wood_floor">Wood floor</option>
+      <option value="laminate_floor">Laminate floor</option>
+      <option value="vinyl_floor">Vinyl floor</option>
 
-  <button onclick="calculateEstimate()">Calculate Estimate</button>
+      <!-- Walls -->
+      <option value="paint_wall">Paint walls</option>
+      <option value="wallpaper">Wallpaper</option>
+      <option value="wall_tile">Wall tile</option>
+
+      <!-- Ceiling -->
+      <option value="paint_ceiling">Paint ceiling</option>
+
+      <!-- Doors/Windows -->
+      <option value="door">Door (per unit)</option>
+      <option value="window">Window (per unit)</option>
+    </select>
+  </div>
+
+  <button onclick="calculateEstimate()">Get Estimate</button>
 
   <div id="result"></div>
 
