@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment Successful</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<h1>Payment Successful!</h1>
+<p>Click below to download your estimate:</p>
+<button id="downloadPdf">Download PDF</button>
+
+<script>
+document.getElementById("downloadPdf").addEventListener("click", () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Refurbishment Estimate", 10, 10);
+  doc.text("Thank you for your payment!", 10, 20);
+  // Add estimate details here
+  doc.save("estimate.pdf");
+});
+</script>
+</body>
+</html>
