@@ -1,52 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Refurbish Price UK</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://js.stripe.com/v3/"></script>
+<meta charset="UTF-8">
+<title>House Refurbishment Estimates UK</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 
 <div class="container">
+  <h1 class="title">House Refurbishment Estimates UK</h1>
+  <p class="subtitle">Select your room, size and materials to get a professional estimate</p>
 
-  <h1 class="title">Refurbish Price UK</h1>
-  <p class="subtitle">Select materials to get your refurbishment estimate</p>
+  <label>Room</label>
+  <select id="room">
+    <option>Bathroom</option>
+    <option>Kitchen</option>
+    <option>Bedroom</option>
+    <option>Living Room</option>
+  </select>
 
-  <div class="form-group">
-    <label>Room</label>
-    <select id="room">
-      <option>Bathroom</option>
-      <option>Kitchen</option>
-      <option>Bedroom</option>
-      <option>Living Room</option>
-    </select>
-  </div>
+  <label>Room size (m²)</label>
+  <input type="number" id="size" placeholder="e.g. 20">
 
-  <div class="form-group">
-    <label>Room size (m²)</label>
-    <input type="number" id="size" placeholder="e.g. 20">
-  </div>
+  <label>Select Materials (Ctrl/Cmd for multiple)</label>
+  <select id="materials" multiple>
+    <option value="tile_floor">Tile Floor</option>
+    <option value="wood_floor">Wood Floor</option>
+    <option value="laminate_floor">Laminate Floor</option>
+    <option value="vinyl_floor">Vinyl Floor</option>
+    <option value="paint_wall">Paint Walls</option>
+    <option value="wallpaper">Wallpaper</option>
+    <option value="wall_tile">Wall Tile</option>
+    <option value="paint_ceiling">Paint Ceiling</option>
+    <option value="door">Door</option>
+    <option value="window">Window</option>
+  </select>
 
-  <div class="form-group">
-    <label>Select Materials (hold Ctrl/Cmd for multiple)</label>
-    <select id="materials" multiple>
-      <option value="tile_floor">Tile Floor</option>
-      <option value="wood_floor">Wood Floor</option>
-      <option value="laminate_floor">Laminate Floor</option>
-      <option value="vinyl_floor">Vinyl Floor</option>
-      <option value="paint_wall">Paint Walls</option>
-      <option value="wallpaper">Wallpaper</option>
-      <option value="wall_tile">Wall Tile</option>
-      <option value="paint_ceiling">Paint Ceiling</option>
-      <option value="door">Door (per unit)</option>
-      <option value="window">Window (per unit)</option>
-    </select>
-  </div>
-
-  <button id="estimateBtn">Get Estimate</button>
-
+  <button id="estimateBtn">Get Estimate & Pay</button>
 </div>
 
 <script src="script.js"></script>
