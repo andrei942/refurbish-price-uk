@@ -3,21 +3,83 @@
 <head>
   <title>Payment Successful</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f0f4f3; text-align:center; padding:50px; }
+    h1 { color: #1b5e20; }
+    button { padding: 15px 25px; font-size:16px; background:#1b5e20; color:white; border:none; border-radius:10px; cursor:pointer; }
+    button:hover { background:#144d17; }
+  </style>
 </head>
 <body>
+
 <h1>Payment Successful!</h1>
-<p>Click below to download your estimate:</p>
+<p>Click below to download your full refurbishment estimate:</p>
 <button id="downloadPdf">Download PDF</button>
 
 <script>
+const materialData = {
+  "tile_floor": { material: 30, labour: 50, name: "Tile Floor" },
+  "wood_floor": { material: 45, labour: 40, name: "Wood Floor" },
+  "laminate_floor": { material: 25, labour: 30, name: "Laminate Floor" },
+  "vinyl_floor": { material: 20, labour: 25, name: "Vinyl Floor" },
+  "paint_wall": { material: 8, labour: 15, name: "Paint Walls" },
+  "wallpaper": { material: 18, labour: 25, name: "Wallpaper" },
+  "wall_tile": { material: 25, labour: 40, name: "Wall Tile" },
+  "paint_ceiling": { material: 6, labour: 10, name: "Paint Ceiling" },
+  "door": { material: 120, labour: 60, name: "Door (per unit)" },
+  "window": { material: 200, labour: 80, name: "Window (per unit)" }
+};
+
+// Simulated data from previous page (normally you would pass via localStorage/session or backend)
+const estimateData = {
+  room: "Bathroom",
+  size: 20,
+  materials: ["tile_floor", "wall_tile", "paint_ceiling", "door"]
+};
+
 document.getElementById("downloadPdf").addEventListener("click", () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.text("Refurbishment Estimate", 10, 10);
-  doc.text("Thank you for your payment!", 10, 20);
-  // Add estimate details here
-  doc.save("estimate.pdf");
+
+  doc.setFontSize(18);
+  doc.text("Refurbishment Estimate", 10, 15);
+  doc.setFontSize(12);
+  doc.text(`Room: ${estimateData.room}`, 10, 25);
+  doc.text(`Room size: ${estimateData.size} m²`, 10, 32);
+
+  // Table headers
+  const tableStart = 40;
+  doc.text("Material", 10, tableStart);
+  doc.text("Material Cost (£)", 70, tableStart);
+  doc.text("Labour Cost (£)", 120, tableStart);
+  doc.text("Total (£)", 170, tableStart);
+
+  let y = tableStart + 8;
+  let grandMaterial = 0;
+  let grandLabour = 0;
+
+  estimateData.materials.forEach(mat => {
+    const data = materialData[mat];
+    const matTotal = data.material * estimateData.size;
+    const labourTotal = data.labour * estimateData.size;
+    const total = matTotal + labourTotal;
+
+    grandMaterial += matTotal;
+    grandLabour += labourTotal;
+
+    doc.text(data.name, 10, y);
+    doc.text(matTotal.toFixed(2), 70, y);
+    doc.text(labourTotal.toFixed(2), 120, y);
+    doc.text(total.toFixed(2), 170, y);
+    y += 8;
+  });
+
+  doc.text("Grand Total", 120, y);
+  doc.text((grandMaterial + grandLabour).toFixed(2), 170, y);
+
+  doc.save("Refurbishment_Estimate.pdf");
 });
 </script>
+
 </body>
 </html>
