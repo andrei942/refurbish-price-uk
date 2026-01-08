@@ -12,7 +12,7 @@ const materialData = {
 };
 
 // Stripe publishable key
-const stripe = Stripe("YOUR_PUBLISHABLE_KEY_HERE");
+pk_live_51Sn2002K6oA46zDCbC6ODNqsrcezcruvdzJJDtzWhY4CXu1t1KM0C2H2M0wh7ahrBg2SeaPJC5mdKkqQSLsYN1Sh00MditgrNv
 
 document.getElementById("estimateBtn").addEventListener("click", async function() {
   const room = document.getElementById("room").value;
