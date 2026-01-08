@@ -10,34 +10,58 @@ function calculateEstimate() {
   let materialCostPerM2 = 0;
   let labourCostPerM2 = 0;
 
-  if (material === "tile") {
-    materialCostPerM2 = 30;
-    labourCostPerM2 = 50;
-  }
+  switch(material) {
+    // Floors
+    case "tile_floor":
+      materialCostPerM2 = 30;
+      labourCostPerM2 = 50;
+      break;
+    case "wood_floor":
+      materialCostPerM2 = 45;
+      labourCostPerM2 = 40;
+      break;
+    case "laminate_floor":
+      materialCostPerM2 = 25;
+      labourCostPerM2 = 30;
+      break;
+    case "vinyl_floor":
+      materialCostPerM2 = 20;
+      labourCostPerM2 = 25;
+      break;
+    
+    // Walls
+    case "paint_wall":
+      materialCostPerM2 = 8;
+      labourCostPerM2 = 15;
+      break;
+    case "wallpaper":
+      materialCostPerM2 = 18;
+      labourCostPerM2 = 25;
+      break;
+    case "wall_tile":
+      materialCostPerM2 = 25;
+      labourCostPerM2 = 40;
+      break;
 
-  if (material === "wood") {
-    materialCostPerM2 = 45;
-    labourCostPerM2 = 40;
-  }
+    // Ceiling
+    case "paint_ceiling":
+      materialCostPerM2 = 6;
+      labourCostPerM2 = 10;
+      break;
 
-  if (material === "laminate") {
-    materialCostPerM2 = 25;
-    labourCostPerM2 = 30;
-  }
+    // Doors / Windows per unit
+    case "door":
+      materialCostPerM2 = 120; // per door
+      labourCostPerM2 = 60;
+      break;
+    case "window":
+      materialCostPerM2 = 200; // per window
+      labourCostPerM2 = 80;
+      break;
 
-  if (material === "vinyl") {
-    materialCostPerM2 = 20;
-    labourCostPerM2 = 25;
-  }
-
-  if (material === "paint") {
-    materialCostPerM2 = 8;
-    labourCostPerM2 = 15;
-  }
-
-  if (material === "wallpaper") {
-    materialCostPerM2 = 18;
-    labourCostPerM2 = 25;
+    default:
+      materialCostPerM2 = 0;
+      labourCostPerM2 = 0;
   }
 
   const materialTotal = size * materialCostPerM2;
