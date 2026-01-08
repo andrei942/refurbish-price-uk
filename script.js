@@ -1,76 +1,47 @@
-function calculateEstimate() {
+const materialData = {
+  "tile_floor": { material: 30, labour: 50, name: "Tile Floor" },
+  "wood_floor": { material: 45, labour: 40, name: "Wood Floor" },
+  "laminate_floor": { material: 25, labour: 30, name: "Laminate Floor" },
+  "vinyl_floor": { material: 20, labour: 25, name: "Vinyl Floor" },
+  "paint_wall": { material: 8, labour: 15, name: "Paint Walls" },
+  "wallpaper": { material: 18, labour: 25, name: "Wallpaper" },
+  "wall_tile": { material: 25, labour: 40, name: "Wall Tile" },
+  "paint_ceiling": { material: 6, labour: 10, name: "Paint Ceiling" },
+  "door": { material: 120, labour: 60, name: "Door (per unit)" },
+  "window": { material: 200, labour: 80, name: "Window (per unit)" }
+};
+
+// Stripe publishable key
+const stripe = Stripe("YOUR_PUBLISHABLE_KEY_HERE");
+
+document.getElementById("estimateBtn").addEventListener("click", async function() {
+  const room = document.getElementById("room").value;
   const size = Number(document.getElementById("size").value);
-  const material = document.getElementById("material").value;
+  const materialsSelect = document.getElementById("materials");
+  const selectedMaterials = Array.from(materialsSelect.selectedOptions).map(opt => opt.value);
 
-  if (!size || size <= 0) {
-    alert("Please enter room size");
-    return;
-  }
+  if (!size || size <= 0) return alert("Enter room size");
+  if (selectedMaterials.length === 0) return alert("Select at least one material");
 
-  let materialCostPerM2 = 0;
-  let labourCostPerM2 = 0;
+  // Save selections for success page
+  localStorage.setItem("estimateData", JSON.stringify({
+    room, size, materials: selectedMaterials
+  }));
 
-  switch(material) {
-    // Floors
-    case "tile_floor":
-      materialCostPerM2 = 30;
-      labourCostPerM2 = 50;
-      break;
-    case "wood_floor":
-      materialCostPerM2 = 45;
-      labourCostPerM2 = 40;
-      break;
-    case "laminate_floor":
-      materialCostPerM2 = 25;
-      labourCostPerM2 = 30;
-      break;
-    case "vinyl_floor":
-      materialCostPerM2 = 20;
-      labourCostPerM2 = 25;
-      break;
-    
-    // Walls
-    case "paint_wall":
-      materialCostPerM2 = 8;
-      labourCostPerM2 = 15;
-      break;
-    case "wallpaper":
-      materialCostPerM2 = 18;
-      labourCostPerM2 = 25;
-      break;
-    case "wall_tile":
-      materialCostPerM2 = 25;
-      labourCostPerM2 = 40;
-      break;
+  let grandTotal = 0;
+  selectedMaterials.forEach(mat => {
+    const data = materialData[mat];
+    grandTotal += (data.material + data.labour) * size;
+  });
 
-    // Ceiling
-    case "paint_ceiling":
-      materialCostPerM2 = 6;
-      labourCostPerM2 = 10;
-      break;
+  const amount = Math.round(grandTotal * 100);
 
-    // Doors / Windows per unit
-    case "door":
-      materialCostPerM2 = 120; // per door
-      labourCostPerM2 = 60;
-      break;
-    case "window":
-      materialCostPerM2 = 200; // per window
-      labourCostPerM2 = 80;
-      break;
+  const res = await fetch("https://YOUR_SERVER_URL/create-checkout-session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount })
+  });
 
-    default:
-      materialCostPerM2 = 0;
-      labourCostPerM2 = 0;
-  }
-
-  const materialTotal = size * materialCostPerM2;
-  const labourTotal = size * labourCostPerM2;
-  const grandTotal = materialTotal + labourTotal;
-
-  document.getElementById("result").innerHTML = `
-    <strong>Material cost:</strong> £${materialTotal.toLocaleString()}<br>
-    <strong>Labour cost:</strong> £${labourTotal.toLocaleString()}<br><br>
-    <strong>Total estimate:</strong> £${grandTotal.toLocaleString()}
-  `;
-}
+  const session = await res.json();
+  stripe.redirectToCheckout({ sessionId: session.id });
+});
