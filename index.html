@@ -11,7 +11,7 @@
 <div class="container">
 
   <h1 class="title">Refurbish Price UK</h1>
-  <p class="subtitle">Select materials to get a full estimate for your UK home</p>
+  <p class="subtitle">Select materials to get a full estimate for your UK home renovation</p>
 
   <div class="form-group">
     <label>Room</label>
@@ -31,29 +31,22 @@
   <div class="form-group">
     <label>Select Materials (hold Ctrl/Cmd for multiple)</label>
     <select id="materials" multiple>
-      <!-- Floors -->
       <option value="tile_floor">Tile floor</option>
       <option value="wood_floor">Wood floor</option>
       <option value="laminate_floor">Laminate floor</option>
       <option value="vinyl_floor">Vinyl floor</option>
-
-      <!-- Walls -->
       <option value="paint_wall">Paint walls</option>
       <option value="wallpaper">Wallpaper</option>
       <option value="wall_tile">Wall tile</option>
-
-      <!-- Ceiling -->
       <option value="paint_ceiling">Paint ceiling</option>
-
-      <!-- Doors / Windows -->
       <option value="door">Door (per unit)</option>
       <option value="window">Window (per unit)</option>
     </select>
   </div>
 
-  <button onclick="calculateEstimate()">Get Estimate</button>
+  <button id="estimateBtn">Get Estimate</button>
 
-  <div id="result"></div>
+  <div id="result" class="result-card"></div>
 
 </div>
 
